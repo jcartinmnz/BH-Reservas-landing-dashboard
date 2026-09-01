@@ -1,12 +1,28 @@
 # Bread House — Plan de implementación y modelo de datos
 
-> **Estado:** propuesta Fase 0, pendiente de aprobación.
-> **Bloqueo activo:** no existe el contenido de `docs/` (menú, libro de marca, sucursales).
-> Sin esos archivos no se puede generar `docs/CONTEXT.md` ni `data/seed.ts` con datos reales.
+> **Estado:** Fase 0 completa, **pendiente del visto bueno para arrancar la Fase 1.**
+> Los documentos fuente ya están en `docs/` y consolidados en `docs/CONTEXT.md`.
 
 ---
 
 ## 1. Decisiones técnicas
+
+### Base de datos: **Neon (Lakebase Postgres)**
+
+Decidido el 2026-09-01. Reemplaza a Supabase, que era lo que pedía el brief original.
+
+Consecuencias sobre el brief:
+
+- **Auth:** Neon Auth en lugar de Supabase Auth para el login del CRM. Los tres roles
+  (`admin`, `gerente_sucursal`, `anfitrion`) viven en la tabla `staff` y las políticas RLS leen el
+  claim del JWT de Neon Auth, no `auth.uid()` de Supabase.
+- **Storage:** Neon Object Storage (S3-compatible) para fotos de sucursal, fotos de plato y los PDF
+  de cotización.
+- **Driver:** `@neondatabase/serverless` sobre HTTP en las rutas serverless de Vercel, con conexión
+  pooled. Conexión directa solo para migraciones.
+- **Ventaja operativa concreta:** una **rama de base de datos por PR**. Las migraciones del esquema
+  se prueban contra una copia real sin tocar producción, que importa en un sistema donde el motor de
+  disponibilidad depende de constraints a nivel de base.
 
 ### ORM: **Drizzle**
 
@@ -21,7 +37,8 @@ Justificación:
   y en cold start. Drizzle es solo TypeScript.
 - **Migraciones revisables.** `drizzle-kit` emite SQL en texto plano, que se lee en el PR. Importa en
   un proyecto con RLS, donde las políticas son parte del esquema.
-- **No ata la decisión de proveedor.** Funciona igual sobre Supabase o sobre Neon.
+- **Encaja con Neon.** Es el ORM de primera clase del ecosistema Neon y funciona con el driver HTTP
+  serverless sin adaptadores.
 
 Contras asumidos: ecosistema menos "batteries included" que Prisma (studio, seeding, generadores).
 
@@ -206,8 +223,8 @@ El del brief, con dos ajustes: el motor de disponibilidad se separa como sub-fas
 
 | Fase | Alcance | Entregable verificable |
 |---|---|---|
-| **0** | Lectura de `docs/`, `CONTEXT.md`, modelo de datos, plan | Este documento aprobado + `docs/CONTEXT.md` |
-| **1** | Setup Next 15, esquema Drizzle + RLS, seed con datos reales, design tokens, primitivas de UI | `pnpm build` verde, migración aplicada, seed cargado |
+| **0** | ✅ Lectura de `docs/`, `CONTEXT.md`, modelo de datos, plan | Hecho — falta el visto bueno |
+| **1** | Setup Next 15, proyecto Neon, esquema Drizzle + RLS, seed con datos reales, design tokens, primitivas de UI | `pnpm build` verde, migración aplicada, seed cargado |
 | **2a** | Motor de disponibilidad en `lib/availability/` con tests unitarios | Suite de tests cubriendo capacidad, solapes, blackouts, anticipación |
 | **2b** | Wizard público de reserva de mesa + correos de confirmación | Reserva end-to-end desde móvil, correo recibido |
 | **3** | Flujo público de eventos + cotizador con recálculo en vivo | Cotización generada, evento en `solicitud`, correos |
@@ -220,18 +237,15 @@ Al cerrar cada fase: demo de lo que quedó funcionando, `build` corrido, y esper
 
 ---
 
-## 4. Datos que faltan para desbloquear la Fase 0
+## 4. Estado de los datos
 
-Sin esto no arranca nada que dependa de datos reales:
+Los documentos fuente están en `docs/` y consolidados en `docs/CONTEXT.md`.
 
-1. **Menú completo** — categorías, platos, descripciones y precios vigentes; línea BH Fit x Perform;
-   menú para mascotas.
-2. **Libro de marca** — paleta 2026 si existe (si no, se confirma la base 2022: `#000000`,
-   `#FFF042`, `#38B6AB`, Montserrat), tipografías con pesos, archivos de logo, tono de voz.
-3. **Sucursales** (Escazú, Pinares/Curridabat, Cartago, Mall San Pedro) — dirección, teléfono,
-   horario por día, capacidad total, capacidad máxima para eventos.
-4. **Mesas por sucursal** — nombre/número, capacidad mínima y máxima, zona.
-5. **Paquetes de evento** — si ya existen definidos comercialmente, o si hay que derivarlos de los
-   precios del menú.
-6. **Política de depósito** — porcentaje o monto fijo para confirmar un evento.
-7. **Capacidad máxima por franja** por sucursal (si no está documentada, se deriva de las mesas).
+- **Resuelto:** horarios de las 4 sucursales, regla de capacidad 30% sáb–dom por franja, stack,
+  menú completo (124 ítems con precio y clasificación), paleta y tipografía, políticas de mesa y
+  evento, depósito 50%, extras, ocasiones.
+- **Pendiente, no bloquea la Fase 1:** los 18 vacíos del registro `CONTEXT.md` §10. El más relevante
+  es el desglose de mesas (C), cubierto por el supuesto S-1.
+- **Bloquea la Fase 2b:** el vacío D — la ventana 20:00–21:00 no tiene franja asignada en las tres
+  sucursales que cierran a las 21:00 de viernes a domingo. Hay que resolverlo antes de construir el
+  grid de horas del wizard.

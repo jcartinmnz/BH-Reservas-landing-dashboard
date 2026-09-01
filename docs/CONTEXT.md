@@ -62,15 +62,27 @@ La ventana 20:00–21:00 no tiene franja asignada. Ver §10-D.
 
 ### Horarios
 
+✅ **Escazú, Pinares y Cartago:** lun–jue 07:00–20:00 · vie–dom 07:00–21:00.
 ✅ **Mall San Pedro:** lun–vie 10:00–20:00 · sáb–dom 09:00–20:00.
 
-⚠️ **Escazú, Pinares y Cartago:** el documento dice *"lun–juv, apertura 7 am y cierre 8 pm y juv-dom
-de 7 am-9pm"*. `juv` aparece en los dos rangos, así que el jueves queda solapado. Ver §10-A.
+> Resuelto 2026-09-01. El original decía *"lun–juv … y juv-dom"*; el segundo `juv` era `vie`.
 
 ### Capacidad de reservas por franja
 
-⚠️ El documento dice: *"de lunes a viernes sin límite y de sábado y domingo 30%"*. Falta definir
-sobre qué base se calcula ese 30% y si el resto queda reservado para walk-in. Ver §10-B.
+✅ **Lunes a viernes: sin límite** — el tope es la capacidad física de la sucursal.
+✅ **Sábado y domingo: 30% de la capacidad total de la sucursal, aplicado a cada franja por
+separado.** El 70% restante de cada franja queda libre para walk-in.
+
+| Sucursal | Capacidad total | Tope reservable por franja, sáb–dom |
+|---|---|---|
+| Escazú | 120 | 36 |
+| Pinares | 180 | 54 |
+| Cartago | 100 | 30 |
+| Mall San Pedro | 40 | 12 |
+
+> Resuelto 2026-09-01. El tope se evalúa **por franja**, no sobre el día completo: un sábado, Escazú
+> admite hasta 36 comensales reservados en Café & Brunch y otros 36 en Fast Lunch, y así con cada
+> franja. Vive en `branch_slot_capacity` para poder ajustarse por sucursal y día sin tocar código.
 
 ---
 
@@ -271,6 +283,29 @@ Roles: `admin` (todo) · `gerente_sucursal` (su sucursal) · `anfitrion` (ver y 
 - Tiempo en **UTC** (`timestamptz`) + `fecha_local` derivada para agrupar reportes.
 - Canales de `source`: `web` · `whatsapp_pani` · `instagram` · `telefono` · `walk_in`.
 
+### Stack
+
+✅ **Neon (Lakebase Postgres)** como base de datos — decidido 2026-09-01, reemplaza a Supabase en el
+brief original. Implica: **Neon Auth** para el login del CRM, **Neon Object Storage** para fotos y
+PDFs de cotización, driver `@neondatabase/serverless` sobre HTTP para las rutas serverless, y una
+**rama de base de datos por PR** para probar migraciones sin tocar producción.
+
+✅ **Drizzle** como ORM · Next.js 15 App Router · Tailwind + shadcn/ui · Recharts · Resend ·
+Zod + react-hook-form · deploy en Vercel.
+
+---
+
+## 11. Supuestos activos
+
+Decisiones tomadas por falta de dato, **reversibles sin migración**. Si alguna es incorrecta, decilo
+y se corrige.
+
+| # | Supuesto | Origen |
+|---|---|---|
+| **S-1** | El motor de disponibilidad valida contra **capacidad de franja y sucursal**, no contra mesas individuales. El esquema incluye `tables` y `reservations.table_id`, pero sin poblar. Al llegar el vacío C se activa la asignación automática sin reescribir nada. | Vacío C sin resolver |
+| **S-2** | El máximo de personas por evento es **por sucursal** (100/100/70/35), no el tope único de 100 que dice `POLITICAS.md`. | Contradicción entre `POLITICAS.md` y `SUCURSALES.md` |
+| **S-3** | El tono de voz es **voseo costarricense** ("reservá", "elegí", "tu mesa"), que es como están escritos los documentos internos. | Vacío O |
+
 ---
 
 ## 9. Assets pendientes de extraer
@@ -288,14 +323,14 @@ De `docs/assets/manual-marca-2022.pdf`, en vectorial, hacia `docs/assets/`:
 
 ## 10. Registro de vacíos — bloquean código
 
-Ordenados por impacto. **A–D bloquean la Fase 1.**
+Ordenados por impacto. **D bloquea la Fase 2b.**
+
+**Resueltos el 2026-09-01:** ~~A (horarios)~~ → §3 · ~~B (regla 30%)~~ → §3 · ~~stack~~ → §8.
 
 | # | Vacío | Qué bloquea |
 |---|---|---|
-| **A** | Horario de Escazú/Pinares/Cartago: `juv` aparece en ambos rangos, el jueves queda solapado | `branch_hours`, y con eso todo el motor de disponibilidad |
-| **B** | Regla "sáb–dom 30%": ¿30% de qué base? ¿el resto es walk-in? | `branch_slot_capacity`, tope de sobreventa por franja |
-| **C** | Desglose de mesas de las 4 sucursales (nombre, cap. mín/máx, zona) | Tabla `tables` y la asignación automática de mesa |
-| **D** | Ventana 20:00–21:00 sin franja, en las 3 sucursales que cierran a las 21:00 | Grid de horas del wizard |
+| **C** | Desglose de mesas de las 4 sucursales (nombre, cap. mín/máx, zona) | Asignación automática de mesa. **No bloquea**: ver supuesto S-1 en §11 |
+| **D** | Ventana 20:00–21:00 sin franja, en las 3 sucursales que cierran a las 21:00 vie–dom | Grid de horas del wizard |
 | E | Pinares: capacidad total 180, pero terraza 100 + interior 50 = 150. Faltan 30 (¿el VIP de 25?) | Capacidad real de la sucursal |
 | F | Paquete Esencial ₡11.500 va **por encima** del valor de carta ₡10.450; los otros dos van por debajo | Precio de los 3 paquetes |
 | G | Direcciones de las 4 sucursales | Selector visual de sucursal |
