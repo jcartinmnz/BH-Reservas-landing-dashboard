@@ -293,6 +293,19 @@ PDFs de cotización, driver `@neondatabase/serverless` sobre HTTP para las rutas
 ✅ **Drizzle** como ORM · Next.js 15 App Router · Tailwind + shadcn/ui · Recharts · Resend ·
 Zod + react-hook-form · deploy en Vercel.
 
+**Proyecto Neon aprovisionado** (2026-09-08):
+
+| | |
+|---|---|
+| Proyecto | `bh-reservas` — `summer-smoke-58039751` |
+| Organización | Josue — `org-withered-block-73817257` |
+| Base | `bh_reservas` · Postgres 17 · `aws-us-east-1` |
+| Rama | `main` — `br-frosty-pine-aw5lrptk` |
+
+Esquema aplicado y seed cargado. Las cadenas de conexión se copian de
+[console.neon.tech](https://console.neon.tech) → proyecto `bh-reservas`. Hacen falta las **dos**:
+la *pooled* (con `-pooler`) para la aplicación y la *directa* para migraciones.
+
 ---
 
 ## 11. Supuestos activos

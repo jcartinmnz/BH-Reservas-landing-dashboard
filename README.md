@@ -20,6 +20,8 @@ Todo en español (`es-CR`), zona horaria `America/Costa_Rica`, moneda CRC.
 |---|---|---|
 | 0 | Documentos fuente, `CONTEXT.md`, modelo de datos, plan | ✅ |
 | 1 | Setup, esquema, seed, design tokens, primitivas de UI | ✅ |
+| — | Base Neon aprovisionada, esquema aplicado, seed cargado | ✅ |
+| — | Deploy en Vercel | ⬜ pendiente de importar el repo |
 | 2 | Motor de disponibilidad + flujo público de mesa + correos | ⬜ |
 | 3 | Flujo público de eventos + cotizador | ⬜ |
 | 4 | CRM: auth, calendario, vista de día | ⬜ |
@@ -64,6 +66,30 @@ Hacen falta **dos** cadenas de conexión de Neon:
 Correr migraciones sobre la conexión pooled falla de formas que no mencionan el
 pooling: PgBouncer corre en modo transacción y no soporta las sentencias de
 sesión que emite `drizzle-kit`.
+
+La base ya está aprovisionada: proyecto Neon `bh-reservas`
+(`summer-smoke-58039751`), base `bh_reservas`, Postgres 17 en `aws-us-east-1`. El esquema está
+aplicado y el seed cargado — las cadenas se copian de
+[console.neon.tech](https://console.neon.tech).
+
+### Verificar que el despliegue quedó conectado
+
+`GET /api/health` responde con los conteos reales de la base:
+
+```json
+{ "estado": "ok", "base": "neon",
+  "conteos": { "sucursales": 4, "menuItems": 124, "paquetes": 4, "franjas": 4 },
+  "seedCompleto": true }
+```
+
+Un build verde no dice nada del enlace a Postgres — Next compila sin base. Este endpoint sí.
+
+### Deploy en Vercel
+
+1. Importar `jcartinmnz/BH-Reservas-landing-dashboard` desde el dashboard de Vercel.
+   Se autodetecta como Next.js.
+2. Cargar las variables de entorno de `.env.example` — como mínimo `DATABASE_URL`.
+3. Confirmar con `GET /api/health` que `seedCompleto` es `true`.
 
 ### Comandos
 
