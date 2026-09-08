@@ -215,9 +215,18 @@ export const customerTags = pgTable(
 
 /* ---------------------------------------------------------------- staff -- */
 
+/**
+ * Personal del CRM.
+ *
+ * La clave es el EMAIL, no el id de Neon Auth. Es un problema de arranque
+ * real: hay que poder dar de alta a alguien y asignarle rol ANTES de que
+ * entre por primera vez, y su id de autenticacion no existe hasta ese
+ * momento. `authUserId` se completa en el primer login.
+ */
 export const staff = pgTable("staff", {
-  /** Id del usuario en Neon Auth. */
-  id: uuid("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** Id en Neon Auth (Stack). Se llena en el primer inicio de sesion. */
+  authUserId: text("auth_user_id").unique(),
   nombre: varchar("nombre", { length: 120 }).notNull(),
   email: varchar("email", { length: 160 }).notNull().unique(),
   rol: rolEnum("rol").notNull().default("anfitrion"),
