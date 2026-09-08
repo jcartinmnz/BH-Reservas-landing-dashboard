@@ -1,0 +1,131 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Bread House — design tokens
+   Fuente: docs/MARCA.md (Manual de Marca 2022). Ningun color se escribe
+   fuera de este bloque.
+
+   REGLA DURA DE CONTRASTE (docs/MARCA.md §5):
+   #FFF042 sobre blanco = 1,2:1 y #38B6AB sobre blanco = 2,3:1. Los dos
+   reprueban WCAG AA. Por eso amarillo y teal existen SOLO como fondo con
+   texto negro encima, nunca como color de texto. Los tokens estan nombrados
+   para que usarlos mal se note: *-bg siempre va con *-on.
+   ========================================================================== */
+
+@theme {
+  /* --- Marca ------------------------------------------------------------ */
+  --color-bh-black: #000000;
+  --color-bh-yellow: #fff042;
+  --color-bh-teal: #38b6ab;
+  --color-bh-white: #ffffff;
+
+  /* Escala neutra derivada del negro de marca */
+  --color-bh-ink-900: #0a0a0a;
+  --color-bh-ink-700: #2e2e2e;
+  --color-bh-ink-500: #6b6b6b;
+  --color-bh-ink-300: #b8b8b8;
+  --color-bh-ink-200: #e2e2e2;
+  --color-bh-ink-100: #f2f1ee;
+  --color-bh-cream: #faf9f6;
+
+  /* --- Pares fondo/texto: la unica forma correcta de usar los acentos --- */
+  --color-accent-bg: #fff042;
+  --color-accent-on: #000000;
+  --color-support-bg: #38b6ab;
+  --color-support-on: #000000;
+
+  /* --- Estados (docs/CONTEXT.md §10-P: no venian en el manual) ---------- */
+  --color-success-bg: #38b6ab;
+  --color-success-on: #000000;
+  --color-success-fg: #0f766e;
+  --color-danger-bg: #fee4e2;
+  --color-danger-on: #7a271a;
+  --color-danger-fg: #d92d20;
+  --color-warning-bg: #fef0c7;
+  --color-warning-on: #7a2e0e;
+  --color-warning-fg: #b54708;
+
+  /* --- Tipografia: Montserrat, 3 pesos (docs/MARCA.md §2.4) ------------- */
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 2.75rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+  --text-display--font-weight: 900;
+
+  --text-title: 1.75rem;
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 700;
+
+  --text-heading: 1.25rem;
+  --text-heading--line-height: 1.3;
+  --text-heading--font-weight: 700;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-body--font-weight: 300;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.45;
+  --text-caption--font-weight: 300;
+
+  --text-overline: 0.6875rem;
+  --text-overline--line-height: 1.2;
+  --text-overline--letter-spacing: 0.14em;
+  --text-overline--font-weight: 700;
+
+  /* --- Forma y profundidad: bordes suaves, sombras discretas ------------ */
+  --radius-card: 1.25rem;
+  --radius-control: 0.875rem;
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(0 0 0 / 0.05), 0 16px 40px -16px rgb(0 0 0 / 0.18);
+
+  /* Target tactil minimo (mobile-first, docs/MARCA.md §6) */
+  --spacing-touch: 2.75rem; /* 44px */
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bh-cream);
+    color: var(--color-bh-ink-900);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  /* Foco visible en toda la app: navegacion por teclado es requisito AA */
+  :focus-visible {
+    outline: 2px solid var(--color-bh-black);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* El campo de telefono abre teclado numerico; sin spinners de number */
+  input[inputmode="numeric"]::-webkit-outer-spin-button,
+  input[inputmode="numeric"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
