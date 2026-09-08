@@ -129,3 +129,20 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@layer components {
+  /* Campo de formulario del wizard: 44px de alto minimo para el target tactil. */
+  .input-bh {
+    min-height: var(--spacing-touch);
+    width: 100%;
+    border-radius: var(--radius-control);
+    border: 1px solid var(--color-bh-ink-200);
+    background: var(--color-bh-white);
+    padding: 0.625rem 0.875rem;
+    font-size: 1rem; /* 16px evita el zoom automatico de iOS al enfocar */
+    font-weight: 300;
+  }
+  .input-bh:focus {
+    border-color: var(--color-bh-ink-900);
+  }
+}

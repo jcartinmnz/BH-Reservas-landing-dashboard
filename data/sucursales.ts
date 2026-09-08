@@ -30,6 +30,13 @@ export type Sucursal = {
   /** null = sin confirmar para Mall San Pedro. */
   tieneBhFit: boolean | null;
   horarios: HorarioDia[];
+  /**
+   * Overrides de politica por sucursal. Sin valor rige `data/politicas.ts`.
+   * El brief los pide configurables por sucursal, y la tabla `branches` los
+   * guarda por fila.
+   */
+  anticipacionMinMesaHoras?: number;
+  anticipacionMaxDias?: number;
 };
 
 /** Lun-jue 07:00-20:00 · vie-dom 07:00-21:00 (docs/CONTEXT.md §3). */
