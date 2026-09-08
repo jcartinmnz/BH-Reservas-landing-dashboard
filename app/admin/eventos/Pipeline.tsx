@@ -6,7 +6,8 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatCRC } from "@/lib/money";
 import { NOMBRE_OCASION, type Ocasion } from "@/data/politicas";
-import { ETAPAS, NOMBRE_ETAPA, moverEtapa, type Etapa } from "./acciones";
+import { moverEtapa } from "./acciones";
+import { ETAPAS, NOMBRE_ETAPA, type Etapa } from "@/lib/crm/estados";
 import type { TarjetaEvento } from "@/lib/crm/consultas";
 
 /**

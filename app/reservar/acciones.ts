@@ -7,10 +7,9 @@
  * lo haya validado: el formulario es comodidad, esto es la frontera real.
  */
 import { headers } from "next/headers";
-import { formatCR } from "@/lib/datetime";
 import { sucursalPorSlug } from "@/data/sucursales";
 import { horariosDisponibles } from "@/lib/availability/queries";
-import { agruparPorFranja, EXPLICACION_MOTIVO, type Slot } from "@/lib/availability/engine";
+import { agruparPorFranja, type Slot } from "@/lib/availability/engine";
 import { crearReserva } from "@/lib/reservas/crear";
 import { consultaHorariosSchema, reservaMesaSchema } from "@/lib/reservas/schema";
 import { enviar } from "@/lib/notifications";
@@ -113,5 +112,3 @@ export async function enviarReserva(entrada: unknown): Promise<RespuestaReserva>
 
   return { ok: true, codigoPublico: resultado.codigoPublico };
 }
-
-export { EXPLICACION_MOTIVO, formatCR };

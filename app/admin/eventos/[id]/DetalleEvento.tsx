@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { formatCRC } from "@/lib/money";
 import { formatearTelefono } from "@/lib/telefono";
 import { NOMBRE_OCASION, POLITICA_EVENTO, type Ocasion } from "@/data/politicas";
-import { NOMBRE_ETAPA, guardarCotizacion, registrarActividad, registrarDeposito, type Etapa } from "../acciones";
+import { guardarCotizacion, registrarActividad, registrarDeposito } from "../acciones";
+import { NOMBRE_ETAPA, type Etapa } from "@/lib/crm/estados";
 
 type Evento = {
   id: string;

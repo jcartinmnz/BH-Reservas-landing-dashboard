@@ -6,26 +6,12 @@ import { z } from "zod";
 import { getDb } from "@/lib/db";
 import { auditLog, reservations } from "@/lib/db/schema";
 import { obtenerSesion, alcanceSucursal, PUEDE } from "@/lib/auth/sesion";
+import { TRANSICIONES } from "@/lib/crm/estados";
 
 const ESTADOS = [
   "pendiente", "confirmada", "sentada", "completada", "cancelada", "no_show",
 ] as const;
 
-/**
- * Transiciones validas del estado de una reserva.
- *
- * Se declaran explicitamente en vez de permitir cualquier cambio: marcar como
- * "sentada" una reserva ya cancelada es un error de operacion, y el sistema
- * deberia impedirlo en vez de guardarlo.
- */
-const TRANSICIONES: Record<string, readonly string[]> = {
-  pendiente: ["confirmada", "cancelada", "no_show"],
-  confirmada: ["sentada", "cancelada", "no_show"],
-  sentada: ["completada", "cancelada"],
-  completada: [],
-  cancelada: [],
-  no_show: [],
-};
 
 const cambiarEstadoSchema = z.object({
   reservationId: z.string().uuid(),
@@ -122,5 +108,3 @@ export async function guardarNotaInterna(entrada: unknown) {
   revalidatePath("/admin");
   return { ok: true as const };
 }
-
-export { TRANSICIONES };

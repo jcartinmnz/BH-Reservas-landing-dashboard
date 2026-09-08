@@ -9,7 +9,7 @@ import { formatCRC } from "@/lib/money";
 import { DEFINICION_FRANJAS, type Franja } from "@/lib/franjas";
 import { NOMBRE_DIA, DIAS_DEBILES, type DiaSemana } from "@/lib/datetime";
 import { NOMBRE_OCASION, type Ocasion } from "@/data/politicas";
-import { NOMBRE_ETAPA, type Etapa } from "../eventos/acciones";
+import { NOMBRE_ETAPA, type Etapa } from "@/lib/crm/estados";
 import type { PorDimension, Ocupacion, MetricasEventos, MetricasClientes, ResumenReservas, Rango } from "@/lib/crm/metricas";
 
 const NOMBRE_CANAL: Record<string, string> = {
