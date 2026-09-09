@@ -58,6 +58,13 @@ export function WizardMesa({ minimo, maximo }: Props) {
     if (indice > 0) setPaso(PASOS[indice - 1]);
   }
 
+  /** Al elegir una hora nueva se limpia el error del rebote anterior. */
+  function elegirHora(h: string) {
+    setError(null);
+    setHora(h);
+    setPaso("datos");
+  }
+
   /** Al elegir fecha se consultan los horarios reales contra la base. */
   function elegirFecha(nuevaFecha: string) {
     setFecha(nuevaFecha);
@@ -227,6 +234,17 @@ export function WizardMesa({ minimo, maximo }: Props) {
       {/* -------------------------------------------------------- hora --- */}
       {paso === "hora" && (
         <div>
+          {/* Si el horario se ocupó mientras llenaba los datos, el wizard lo
+              devuelve acá. El motivo tiene que viajar con él: rebotarlo sin
+              explicación es peor que no rebotarlo. */}
+          {error && (
+            <p
+              role="alert"
+              className="mb-4 rounded-control bg-danger-bg p-3 text-caption text-danger-on"
+            >
+              {error} Elegí otro horario.
+            </p>
+          )}
           {cargandoHoras && (
             <p className="flex items-center gap-2 py-8 text-bh-ink-500">
               <Loader2 className="size-4 animate-spin" /> Buscando horarios…
@@ -254,10 +272,7 @@ export function WizardMesa({ minimo, maximo }: Props) {
                         type="button"
                         disabled={!s.disponible}
                         title={s.motivo ? EXPLICACION_MOTIVO[s.motivo] : undefined}
-                        onClick={() => {
-                          setHora(s.hora);
-                          setPaso("datos");
-                        }}
+                        onClick={() => elegirHora(s.hora)}
                         className={cn(
                           "min-h-touch rounded-control border text-body transition",
                           hora === s.hora && "border-bh-ink-900 bg-bh-ink-900 text-bh-white",

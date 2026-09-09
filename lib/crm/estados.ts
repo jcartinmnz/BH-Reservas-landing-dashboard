@@ -22,6 +22,19 @@ export const TRANSICIONES: Record<string, readonly string[]> = {
   no_show: [],
 };
 
+/**
+ * Estados en los que el CLIENTE todavia puede cancelar desde el link del
+ * correo.
+ *
+ * Vive aca y no duplicado en la UI y en el servicio: cuando estaban separados,
+ * la UI ofrecia el boton para reservas confirmadas pero el servicio solo
+ * cancelaba las pendientes, asi que el boton no hacia nada. Con una sola lista
+ * no pueden volver a desalinearse.
+ */
+export const CANCELABLES_POR_CLIENTE = ["pendiente", "confirmada"] as const;
+
+export type EstadoCancelable = (typeof CANCELABLES_POR_CLIENTE)[number];
+
 export const ETAPAS = [
   "solicitud", "contactado", "cotizacion_enviada", "negociacion",
   "confirmado", "realizado", "perdido",

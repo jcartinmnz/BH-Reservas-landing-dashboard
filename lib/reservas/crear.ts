@@ -10,7 +10,7 @@
  * base (EXCLUDE de solape e indice unico anti duplicado) son la garantia real,
  * y aca se traducen sus errores a mensajes que el cliente entienda.
  */
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { getDb } from "@/lib/db";
 import { customers, reservations } from "@/lib/db/schema";
 import { aUTC } from "@/lib/datetime";
@@ -21,6 +21,7 @@ import { generarCodigoPublico } from "@/lib/codigo";
 import { firmarToken, hashDeToken } from "@/lib/tokens";
 import { normalizarTelefonoCR } from "@/lib/telefono";
 import { horariosDisponibles } from "@/lib/availability/queries";
+import { CANCELABLES_POR_CLIENTE } from "@/lib/crm/estados";
 
 export type DatosReserva = {
   sucursalSlug: string;
@@ -159,7 +160,17 @@ export async function buscarPorCodigo(codigoPublico: string) {
   return r ?? null;
 }
 
-/** Cancela una reserva viva. Idempotente sobre una ya cancelada. */
+/**
+ * Cancela una reserva viva desde el lado del cliente.
+ *
+ * Aplica a `pendiente` y a `confirmada`: una vez que el equipo confirma, la
+ * reserva sigue siendo cancelable por el cliente hasta la tolerancia acordada
+ * — de hecho ese es el caso normal, porque el correo con el link de cancelar
+ * sale junto con la confirmacion.
+ *
+ * No toca `sentada`, `completada`, `cancelada` ni `no_show`: esas ya no las
+ * decide el cliente. Devuelve `false` en ese caso, y la UI lo dice.
+ */
 export async function cancelarReserva(reservationId: string, motivo?: string) {
   const db = getDb();
   const [r] = await db
@@ -171,7 +182,10 @@ export async function cancelarReserva(reservationId: string, motivo?: string) {
       motivoCancelacion: motivo || null,
     })
     .where(
-      and(eq(reservations.id, reservationId), eq(reservations.estado, "pendiente")),
+      and(
+        eq(reservations.id, reservationId),
+        inArray(reservations.estado, [...CANCELABLES_POR_CLIENTE]),
+      ),
     )
     .returning({ id: reservations.id });
   return Boolean(r);

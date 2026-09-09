@@ -33,7 +33,15 @@ export function Barras({
     <ResponsiveContainer width="100%" height={alto}>
       <BarChart data={datos} layout="vertical" margin={{ left: 4, right: 40, top: 4, bottom: 4 }}>
         <CartesianGrid horizontal={false} stroke={GRILLA} />
-        <XAxis type="number" tick={{ fill: EJE, fontSize: 11 }} axisLine={false} tickLine={false} />
+        <XAxis
+          type="number"
+          tick={{ fill: EJE, fontSize: 11 }}
+          axisLine={false}
+          tickLine={false}
+          // El eje usa el mismo formato que el tooltip: sin esto, un gráfico de
+          // montos muestra céntimos crudos (140000000) en vez de ₡1.400.000.
+          tickFormatter={(v) => fmt(Number(v))}
+        />
         <YAxis
           type="category" dataKey="etiqueta" width={110}
           tick={{ fill: EJE, fontSize: 11 }} axisLine={false} tickLine={false}

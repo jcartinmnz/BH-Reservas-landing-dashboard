@@ -5,6 +5,7 @@ import { CalendarX, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge, NOMBRE_ESTADO } from "@/components/ui/badge";
 import { cancelarReservaAction } from "./acciones";
+import { CANCELABLES_POR_CLIENTE } from "@/lib/crm/estados";
 
 type Props = {
   reservationId: string;
@@ -23,7 +24,9 @@ export function GestionReserva(props: Props) {
   const [confirmando, setConfirmando] = useState(false);
   const [pendiente, iniciar] = useTransition();
 
-  const cancelable = estado === "pendiente" || estado === "confirmada";
+  // Misma lista que usa el servicio, para que el botón nunca se muestre
+  // cuando la cancelación no va a proceder.
+  const cancelable = (CANCELABLES_POR_CLIENTE as readonly string[]).includes(estado);
 
   function cancelar() {
     setError(null);

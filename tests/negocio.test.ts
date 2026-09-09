@@ -133,3 +133,20 @@ describe("menu", () => {
     expect(orden[0].nombre).toBe("Salmón");
   });
 });
+
+describe("estados cancelables por el cliente", () => {
+  it("incluye confirmada, no solo pendiente", async () => {
+    const { CANCELABLES_POR_CLIENTE } = await import("@/lib/crm/estados");
+    // El link de cancelar sale junto con la confirmación, así que el caso
+    // normal es cancelar una reserva YA confirmada. Cuando esta lista decía
+    // solo "pendiente", el botón se mostraba y no hacía nada.
+    expect([...CANCELABLES_POR_CLIENTE]).toEqual(["pendiente", "confirmada"]);
+  });
+
+  it("no deja que el cliente toque estados que ya no le corresponden", async () => {
+    const { CANCELABLES_POR_CLIENTE } = await import("@/lib/crm/estados");
+    for (const cerrado of ["sentada", "completada", "cancelada", "no_show"]) {
+      expect(CANCELABLES_POR_CLIENTE as readonly string[]).not.toContain(cerrado);
+    }
+  });
+});

@@ -84,12 +84,32 @@ aplicado y el seed cargado — las cadenas se copian de
 
 Un build verde no dice nada del enlace a Postgres — Next compila sin base. Este endpoint sí.
 
-### Deploy en Vercel
+### Puesta en producción — lo que falta
 
-1. Importar `jcartinmnz/BH-Reservas-landing-dashboard` desde el dashboard de Vercel.
-   Se autodetecta como Next.js.
-2. Cargar las variables de entorno de `.env.example` — como mínimo `DATABASE_URL`.
-3. Confirmar con `GET /api/health` que `seedCompleto` es `true`.
+El código está completo y probado de punta a punta contra un Postgres real.
+Quedan tres cosas que necesitan credenciales que no se pueden generar por API:
+
+| # | Qué | Dónde se consigue | Sin esto |
+|---|---|---|---|
+| 1 | `STACK_SECRET_SERVER_KEY` | console.neon.tech → `bh-reservas` → Auth → Configuration | `/admin` avisa que falta configurar; el flujo público funciona igual |
+| 2 | `RESEND_API_KEY` | resend.com → API Keys | Las reservas se guardan bien pero no sale correo |
+| 3 | Importar el repo en Vercel | vercel.com → Add New → Project | No hay URL pública |
+
+Además, generá dos secretos propios:
+
+```bash
+openssl rand -hex 32   # CANCEL_TOKEN_SECRET — firma los links de cancelar
+openssl rand -hex 32   # PANI_API_KEY — autentica el endpoint de Pani
+openssl rand -hex 32   # CRON_SECRET — protege el cron de recordatorios
+```
+
+Cargá todo en Vercel → Settings → Environment Variables, y confirmá con
+`GET /api/health` que `seedCompleto` es `true`.
+
+**El login del CRM entra por Google o GitHub** (email/contraseña viene
+deshabilitado en el proyecto de Neon Auth). Autenticarse no basta: el correo
+tiene que estar en la tabla `staff`. El de `josue281011@gmail.com` ya está
+cargado como `admin`.
 
 ### Rutas
 
@@ -208,6 +228,11 @@ navegador. Toda ruta pública pasa por `aVistaPublica()`.
 `staff` dice *qué* puede hacer. Lograr iniciar sesión no da acceso: si el correo
 no está en `staff`, no entra. El alcance por sucursal se aplica en todas las
 consultas del CRM, no solo donde se ve la lista.
+
+**Los estados cancelables viven en un solo lugar.** `CANCELABLES_POR_CLIENTE`
+en `lib/crm/estados.ts` la usan tanto la UI como el servicio. Cuando estaban
+duplicados, la UI ofrecía el botón de cancelar para reservas confirmadas pero
+el servicio solo cancelaba las pendientes, así que el botón no hacía nada.
 
 **Los colores de los gráficos no son los de marca.** `#FFF042` sobre blanco da
 1,2:1 y es invisible como marca de dato; `#38B6AB` queda debajo del piso de
